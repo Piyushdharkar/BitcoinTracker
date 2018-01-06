@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val url = "https://blockchain.info/ticker"
-        val timeDuration = 300000.toLong()
+        val timeDuration = 600000.toLong()
     }
 
     private val handler = Handler()
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: String) {
             val jsonObject = JSONObject(result)
-            val usdRate = jsonObject.getJSONObject("USD")
+            val usdRate = jsonObject.getJSONObject("INR")
             val buyPrice = usdRate.getDouble("buy")
             val sellPrice = usdRate.getDouble("sell")
             val currency = usdRate.getString("symbol")
