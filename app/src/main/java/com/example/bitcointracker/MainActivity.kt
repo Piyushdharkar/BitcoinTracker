@@ -3,6 +3,8 @@ package com.example.bitcointracker
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
@@ -17,17 +19,26 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val url = "https://blockchain.info/ticker"
+        val timeDuration = 10000.toLong()
+    }
+
+    private val handler = Handler()
+    private val runnable = object : Runnable {
+        override fun run() {
+            try {
+                DownloadTask().execute(url)
+                handler.postDelayed(this, timeDuration)
+            } catch (e: Exception) {
+                Toast.makeText(applicationContext, "An error has occurred", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        try {
-            DownloadTask().execute(url)
-        } catch (e: Exception) {
-            Toast.makeText(this, "An error has occurred", Toast.LENGTH_LONG).show()
-        }
+        runnable.run()
     }
 
     fun updateTextViews(buyPrice: Double, sellPrice: Double) {
@@ -41,8 +52,7 @@ class MainActivity : AppCompatActivity() {
             val url = URL(urls[0])
             try {
                 val httpURLConnection: HttpURLConnection = url.openConnection() as? HttpURLConnection ?: throw MalformedURLException()
-                val inputStream = httpURLConnection.inputStream
-                val inputStreamReader = InputStreamReader(inputStream)
+                val inputStreamReader = InputStreamReader(httpURLConnection.inputStream)
 
                 var data: Int = inputStreamReader.read()
                 var result = ""
