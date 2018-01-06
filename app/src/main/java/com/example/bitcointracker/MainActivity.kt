@@ -1,15 +1,16 @@
 package com.example.bitcointracker
 
+import android.content.res.Configuration
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
-import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val url = "https://blockchain.info/ticker"
-        val timeDuration = 10000.toLong()
+        val timeDuration = 300000.toLong()
     }
 
     private val handler = Handler()
@@ -39,11 +40,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         runnable.run()
+
+        button.setOnClickListener {
+            supportActionBar?.let { supportActionBar?.hide() }
+            enterPictureInPictureMode()
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+
+        if (isInPictureInPictureMode) {
+            button.animate().alpha(0.0f).duration = 0
+        } else {
+            supportActionBar?.let { supportActionBar?.show() }
+            button.animate().alpha(1.0f).duration = 3000
+        }
     }
 
     fun updateTextViews(buyPrice: Double, sellPrice: Double) {
-        buyTextView.text = "Buying Price: $buyPrice$"
-        sellTextView.text = "Selling Price: $sellPrice$"
+        buyTextView.text = "$buyPrice $"
+        sellTextView.text = "$sellPrice $"
     }
 
     inner class DownloadTask : AsyncTask<String, Void, String>() {
