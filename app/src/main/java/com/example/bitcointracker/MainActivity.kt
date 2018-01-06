@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val url = "https://blockchain.info/ticker"
-        val timeDuration = 1000.toLong()
+        val timeDuration = 300000.toLong()
     }
 
 

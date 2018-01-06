@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="8dp"
+        android:background="@color/buttonColor"
         android:text="Hide"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
@@ -38,10 +39,10 @@
             android:layout_marginBottom="8dp"
             android:fontFamily="@font/archivo_black"
             android:gravity="center"
-            android:text="Sample Text"
+            android:text=""
             android:textColor="@android:color/black"
             android:textSize="40sp"
-            android:textStyle="bold" />
+            android:textStyle="bold|italic" />
 
         <TextView
             android:id="@+id/sellTextView"
@@ -51,10 +52,10 @@
             android:layout_marginTop="32dp"
             android:fontFamily="@font/archivo_black"
             android:gravity="center"
-            android:text="Sample Text"
+            android:text=""
             android:textColor="@android:color/black"
             android:textSize="40sp"
-            android:textStyle="bold" />
+            android:textStyle="bold|italic" />
 
     </LinearLayout>
 
@@ -64,6 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/archivo_black"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
