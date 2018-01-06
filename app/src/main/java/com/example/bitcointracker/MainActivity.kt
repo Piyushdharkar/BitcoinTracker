@@ -63,9 +63,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateTextViews(buyPrice: Double, sellPrice: Double) {
-        buyTextView.text = "$buyPrice $"
-        sellTextView.text = "$sellPrice $"
+    fun updateTextViews(buyPrice: Double, sellPrice: Double, currency: String) {
+        buyTextView.text = "$buyPrice $currency"
+        sellTextView.text = "$sellPrice $currency"
     }
 
     inner class DownloadTask : AsyncTask<String, Void, String>() {
@@ -99,8 +99,9 @@ class MainActivity : AppCompatActivity() {
             val usdRate = jsonObject.getJSONObject("USD")
             val buyPrice = usdRate.getDouble("buy")
             val sellPrice = usdRate.getDouble("sell")
+            val currency = usdRate.getString("symbol")
 
-            updateTextViews(buyPrice, sellPrice)
+            updateTextViews(buyPrice, sellPrice, currency)
         }
     }
 }
