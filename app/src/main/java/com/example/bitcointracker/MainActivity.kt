@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,8 +21,12 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val url = "https://blockchain.info/ticker"
-        val timeDuration = 600000.toLong()
+        val timeDuration = 1000.toLong()
     }
+
+
+    private var currency = "USD"
+    private val currencies: ArrayList<String> = arrayListOf("USD", "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "DKK", "EUR", "GBP", "HKD", "INR", "ISK", "JPY", "KRW", "NZD", "PLN", "RUB", "SEK", "SGD", "THB", "TWD")
 
     private val handler = Handler()
     private val runnable = object : Runnable {
@@ -45,6 +50,8 @@ class MainActivity : AppCompatActivity() {
             supportActionBar?.let { supportActionBar?.hide() }
             enterPictureInPictureMode()
         }
+
+        spinner.adapter = ArrayAdapter(applicationContext, android.R.layout.simple_list_item_1, currencies)
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
@@ -63,9 +70,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateTextViews(buyPrice: Double, sellPrice: Double, currency: String) {
-        buyTextView.text = "$buyPrice $currency"
-        sellTextView.text = "$sellPrice $currency"
+    fun updateTextViews(buyPrice: Double, sellPrice: Double, currencySymbol: String) {
+        buyTextView.text = "$buyPrice $currencySymbol"
+        sellTextView.text = "$sellPrice $currencySymbol"
     }
 
     inner class DownloadTask : AsyncTask<String, Void, String>() {
@@ -95,13 +102,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onPostExecute(result: String) {
-            val jsonObject = JSONObject(result)
-            val usdRate = jsonObject.getJSONObject("INR")
-            val buyPrice = usdRate.getDouble("buy")
-            val sellPrice = usdRate.getDouble("sell")
-            val currency = usdRate.getString("symbol")
+            currency = currencies[spinner.selectedItemId.toInt()]
 
-            updateTextViews(buyPrice, sellPrice, currency)
+            val jsonObject = JSONObject(result)
+            val currencyType = jsonObject.getJSONObject(currency)
+            val buyPrice = currencyType.getDouble("buy")
+            val sellPrice = currencyType.getDouble("sell")
+            val currencySymbol = currencyType.getString("symbol")
+
+            updateTextViews(buyPrice, sellPrice, currencySymbol)
         }
     }
 }
