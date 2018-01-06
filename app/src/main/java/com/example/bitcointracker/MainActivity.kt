@@ -52,9 +52,14 @@ class MainActivity : AppCompatActivity() {
 
         if (isInPictureInPictureMode) {
             button.animate().alpha(0.0f).duration = 0
+            buyTextView.textSize = 20f
+            sellTextView.textSize = 20f
         } else {
+            buyTextView.textSize = 40f
+            sellTextView.textSize = 40f
             supportActionBar?.let { supportActionBar?.show() }
             button.animate().alpha(1.0f).duration = 3000
+
         }
     }
 
