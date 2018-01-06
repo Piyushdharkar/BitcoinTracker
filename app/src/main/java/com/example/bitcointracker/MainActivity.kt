@@ -31,8 +31,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateTextViews(buyPrice: Double, sellPrice: Double) {
-        buyTextView.text = buyPrice.toString()
-        sellTextView.text = sellPrice.toString()
+        buyTextView.text = "Buying Price: $buyPrice$"
+        sellTextView.text = "Selling Price: $sellPrice$"
     }
 
     inner class DownloadTask : AsyncTask<String, Void, String>() {
@@ -43,10 +43,16 @@ class MainActivity : AppCompatActivity() {
                 val httpURLConnection: HttpURLConnection = url.openConnection() as? HttpURLConnection ?: throw MalformedURLException()
                 val inputStream = httpURLConnection.inputStream
                 val inputStreamReader = InputStreamReader(inputStream)
-                val bufferedReader = BufferedReader(inputStreamReader)
-                val list = bufferedReader.readLines()
 
-                return list.joinToString()
+                var data: Int = inputStreamReader.read()
+                var result = ""
+
+                while (data != -1) {
+                    result += data.toChar()
+                    data = inputStreamReader.read()
+                }
+
+                return result
             } catch (malformedURLException: MalformedURLException) {
                 Log.i("Exception", "Error in opening connection")
             } catch (e: Exception) {
