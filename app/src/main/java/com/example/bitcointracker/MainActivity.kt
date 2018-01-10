@@ -4,11 +4,12 @@ import android.content.res.Configuration
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
@@ -24,8 +25,8 @@ class MainActivity : AppCompatActivity() {
         val timeDuration = 300000.toLong()
     }
 
-
-    private var currency = "USD"
+    private val currencyList = HashMap<String, CurrencyData>()
+    private var currencySelected = "USD"
     private val currencies: ArrayList<String> = arrayListOf("USD", "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "DKK", "EUR", "GBP", "HKD", "INR", "ISK", "JPY", "KRW", "NZD", "PLN", "RUB", "SEK", "SGD", "THB", "TWD")
 
     private val handler = Handler()
@@ -44,14 +45,25 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        runnable.run()
-
         button.setOnClickListener {
             supportActionBar?.let { supportActionBar?.hide() }
             enterPictureInPictureMode()
         }
 
         spinner.adapter = ArrayAdapter(applicationContext, android.R.layout.simple_list_item_1, currencies)
+
+        spinner.setSelection(0)
+
+        runnable.run()
+
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                updateTextViews(spinner.selectedItem.toString())
+            }
+        }
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
@@ -70,9 +82,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateTextViews(buyPrice: Double, sellPrice: Double, currencySymbol: String) {
-        buyTextView.text = "$buyPrice $currencySymbol"
-        sellTextView.text = "$sellPrice $currencySymbol"
+    fun updateTextViews(currencySelected: String) {
+        try {
+            val buyPrice = currencyList[currencySelected]?.buy ?: throw Exception()
+            val sellPrice = currencyList[currencySelected]?.sell ?: throw Exception()
+            val currencySymbol = currencyList[currencySelected]?.symbol ?: throw Exception()
+
+            buyTextView.text = "$buyPrice $currencySymbol"
+            sellTextView.text = "$sellPrice $currencySymbol"
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     inner class DownloadTask : AsyncTask<String, Void, String>() {
@@ -102,15 +123,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onPostExecute(result: String) {
-            currency = currencies[spinner.selectedItemId.toInt()]
 
             val jsonObject = JSONObject(result)
-            val currencyType = jsonObject.getJSONObject(currency)
-            val buyPrice = currencyType.getDouble("buy")
-            val sellPrice = currencyType.getDouble("sell")
-            val currencySymbol = currencyType.getString("symbol")
 
-            updateTextViews(buyPrice, sellPrice, currencySymbol)
+            for (currency in currencies) {
+                val currencyType = jsonObject.getJSONObject(currency)
+                val buyPrice = currencyType.getDouble("buy")
+                val sellPrice = currencyType.getDouble("sell")
+                val currencySymbol = currencyType.getString("symbol")
+                currencyList[currency] = CurrencyData(buy = buyPrice, sell = sellPrice, symbol = currencySymbol)
+            }
+
+            currencySelected = currencies[spinner.selectedItemId.toInt()]
+
+            updateTextViews(currencySelected)
         }
     }
 }
